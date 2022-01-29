@@ -1,135 +1,165 @@
-import "./styles.css";
-import { movies } from "./data";
-import React from "react";
 
-import EditModal from "./EditModal";
-import AddModal from "./AddModal";
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      movies: movies,
-      movie: null,
-      openModal: false,
-      openAddModal: false
-    };
-  }
+import axios from 'axios';
+import React, { Component } from 'react'
+import styled from 'styled-components'
+import ChildA from './ChildA';
 
-  handleEdit = (movie) => {
-    //console.log(movie);
-    this.setState({
-      openModal: true,
-      movie: movie
-    });
-  };
+export default class App extends Component {
 
-  handleSave = (id, title, genre) => {
-    //console.log("click handel save");
-    //console.log(title);
+    constructor(){
+        super()
+        this.state = {
+           users : [],
+           fontFamilies : ["Roboto", "Lato", "Poppins", "Dongle", "Comforter"],
+           colors : ["#15d31b", "#2d2657", "#850630", "#837420"],
+           fontFamily : "",
+           color : "",
+           searchText : ""
+        }
+    }
 
-    const tempMovies = this.state.movies;
-    //console.log(tempMovies);
+    componentDidMount(){
+        const fetchData = async () => {
+            const res = await axios.get("https://jsonplaceholder.typicode.com/users");
+            this.setState({
+              users: res.data
+            });
+          };
+      
+          fetchData();
+    }
 
-    const updatedMovies = tempMovies.map((movie) => {
-      if (movie.id == id) {
-        movie.title = title;
-        movie.genre = genre;
-      }
 
-      return movie;
-    });
+    filterUsers = () => {
+        const filteredUsers = this.state.users.filter(user => user.name.includes(this.state.searchText) || user.email.includes(this.state.searchText) || user.username.includes(this.state.searchText)) ;
+        console.log(filteredUsers);
+        return filteredUsers ;
+    }
 
-    this.setState({
-      movies: updatedMovies,
-      openModal: false
-    });
-  };
 
-  closeModal = () => {
-    this.setState({
-      openModal: false
-    });
-  };
 
-  handleDelete = (id) => {
-    const tempMovies = this.state.movies;
-    const updatedMovies = tempMovies.filter((movie) => movie.id !== id);
-    this.setState({
-      movies: updatedMovies
-    });
-  };
+    
 
-  addMovieHandler = (title, genre) => {
-    const newMovie = {
-      id: Math.floor(Math.random() * 10000),
-      title,
-      genre
-    };
+    render() {
 
-    const tempMovies = this.state.movies;
-    tempMovies.push(newMovie);
-
-    this.setState({
-      movies: tempMovies,
-      openAddModal: false
-    });
-  };
-
-  render() {
-    return (
-      <>
-        <div className="App">
-          <button onClick={() => this.setState({ openAddModal: true })}>
-            Add Movie
-          </button>
-          {this.state.openAddModal ? (
-            <AddModal
-              addMovieHandler={this.addMovieHandler}
-              closeModal={() => this.setState({ openAddModal: false })}
-            />
-          ) : null}
-          <table>
-            <thead>
-              <tr>
-                <th>Id </th>
-                <th> Title </th>
-                <th> Genre </th>
-                <th> Action </th>
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.movies.map((movie) => {
-                return (
-                  <tr>
-                    <td>{movie.id}</td>
-                    <td>{movie.title}</td>
-                    <td>{movie.genre}</td>
-                    <td>
-                      <button onClick={() => this.handleEdit(movie)}>
-                        Edit
-                      </button>
-                      <button onClick={() => this.handleDelete(movie.id)}>
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {this.state.openModal ? (
-          <EditModal
-            movie={this.state.movie}
-            handleSave={this.handleSave}
-            closeModal={this.closeModal}
-          />
-        ) : null}
-      </>
-    );
-  }
+        return (
+            <Container>
+                <Wrapper>
+                    <SearchBar>
+                        <span>search : </span>
+                        <input type="text" placeholder="search by Id, name, username, email ..."  onChange={(e) => this.setState({searchText : e.target.value})}/>
+                    </SearchBar>
+                    <SelectFonts>
+                        <span>set Fonts : </span>
+                        <select onChange={(e) => this.setState({fontFamily : e.target.value})}>
+                            {
+                                this.state.fontFamilies.map(font => <option value={font}>{font}</option>)
+                            }
+                        </select>
+                        <span>set Fonts : </span>
+                        <select onChange={(e) => this.setState({color : e.target.value})}>
+                            {
+                                this.state.colors.map(color => <option value={color}>{color}</option>)
+                            }
+                        </select>
+                    </SelectFonts>
+                    <List>
+                        <Row color={"black"} fw={700}>
+                            <Col>
+                                Name
+                            </Col>
+                            <Col>
+                                Username
+                            </Col>
+                            <Col>
+                                Email
+                            </Col>    
+                        </Row>
+                        <tbody>
+                        {
+                            this.filterUsers()?.map(user => (
+                                <Row key={user.id} font={this.state.fontFamily} color={this.state.color}>
+                            <Col>
+                                {user.name}
+                            </Col>
+                            <Col>
+                                {user.username}
+                            </Col>
+                            <Col>
+                                {user.email}
+                            </Col>
+                        </Row>
+                            ))
+                        }
+                        </tbody>
+                    </List>
+                </Wrapper>
+            </Container>
+        )
+    }
 }
 
-export default App;
+
+const Container = styled.div`
+   width : 100vw ;
+   height : 100vh ;
+   background-color: aliceblue;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+` ;
+
+const Wrapper = styled.div`
+  background-color: #fadeda;
+  padding : 1rem 2rem;
+` ;
+
+const SearchBar = styled.div`
+ padding: 1rem;
+ input {
+     margin-top: 1rem;
+     width : 100%;
+     height : 2rem;
+     border-radius: 0.5rem;
+     border:none;
+     padding: 0.5rem;
+     text-align: center;
+
+     &::placeholder{
+         font-weight: 100;
+         color : red;
+         opacity: 0.2;
+     }
+ }
+`;
+
+const SelectFonts = styled.div`
+  padding: 1rem ;
+  select{
+      width : 8rem;
+      height : 2rem;
+      padding: 0.5rem;
+      border:none;
+      border-radius: 1rem;
+      margin-right: 1rem;
+  }
+` ;
+
+const List = styled.table`
+  background-color: #f19f94;
+  padding : 1rem 2rem;
+  box-shadow: 5px 5px 5px 5px rgba(0,0,0,0.5) ;
+  font-weight: 500;
+  ` ;
+
+const Row = styled.tr`
+  font-weight: ${(props) => props.fw ? props.fw : 400} ;
+  font-family: ${({font}) => font ? font : "sans-serif" };
+  color: ${({color}) => color ? color : "white" };
+` ;
+
+const Col = styled.td` 
+  font-family: inherit;     // inherits property from their parent "Row"
+  padding: 0.5rem 2rem;
+` ;
