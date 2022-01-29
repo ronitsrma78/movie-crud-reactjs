@@ -3,7 +3,6 @@
 import axios from 'axios';
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import ChildA from './ChildA';
 
 export default class App extends Component {
 
