@@ -2,3 +2,13 @@
   font-family: sans-serif;
   text-align: center;
 }
+
+a {
+  text-decoration: none;
+  margin: 1rem;
+}
+
+.active {
+  background-color: pink;
+  font-size: 1.25rem;
+}
