@@ -1,36 +1,71 @@
-import App from "./App";
-
-import { Component } from "react";
+import React, { Component } from "react";
 import { Provider } from "./context";
 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import { auth } from "./firebase/auth_config";
+
 class Store extends Component {
-  state = {
-    users: [
-      { username: "rakesh", password: "1234" },
-      { username: "john", password: "3456" }
-    ],
-    current_user: ""
+  constructor() {
+    super();
+    this.state = {
+      users: [{ name: "rohit", username: "rohit", password: "1234" }],
+      current_user: "",
+      posts: [],
+    };
+  }
+
+  componentWillMount() {}
+
+  signup = async (email, password) => {
+    try {
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(user);
+      this.setState({
+        current_user: user,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  login = (username, password) => {
-    const getUser = this.state.users.find(
-      (user) => user.username == username && user.password == password
-    );
-    //console.log(getUser);
-    this.setState({ current_user: getUser });
+  login = async (email, password) => {
+    try {
+      const user = await signInWithEmailAndPassword(auth, email, password);
+      console.log(user);
+      this.setState({
+        current_user: user,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  logout = () => {
-    this.setState({ current_user: "" });
+  logout = async () => {
+    try {
+      await signOut(auth);
+      this.setState({ current_user: null });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   render() {
+    console.log(this.state.users);
+    const { users, current_user, posts } = this.state;
+    const { login, logout, signup } = this;
     return (
       <Provider
         value={{
-          data: this.state,
-          login: this.login,
-          logout: this.logout
+          users,
+          current_user,
+          posts,
+          login,
+          logout,
+          signup,
         }}
       >
         {this.props.children}
