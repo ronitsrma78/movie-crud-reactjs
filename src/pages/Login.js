@@ -2,34 +2,32 @@ import { Component } from "react";
 import { context } from "../context";
 
 class Login extends Component {
-  state = {
-    username: "",
-    password: ""
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: "",
+      password: "",
+    };
+  }
 
-  handleChange = (e) => {
-    // console.log(e.target.name);
-    // console.log(e.target.value);
-
+  changeHandler = (e) => {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  submitForm = (e) => {
+  submitHandler = (e) => {
     e.preventDefault();
-    this.context.login(this.state.username, this.state.password);
+    this.context.login(this.state.email, this.state.password);
   };
 
   render() {
     return (
-      <div>
-        <form onSubmit={this.submitForm}>
-          <input type="text" name="username" onChange={this.handleChange} />
-          <input type="password" name="password" onChange={this.handleChange} />
-          <button type="submit">Login</button>
-        </form>
-      </div>
+      <form onSubmit={this.submitHandler}>
+        <input type="text" name="email" onChange={this.changeHandler} />
+        <input type="text" name="password" onChange={this.changeHandler} />
+        <button type="submit">Login</button>
+      </form>
     );
   }
 }
