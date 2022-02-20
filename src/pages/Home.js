@@ -1,17 +1,16 @@
-import { Component } from "react";
+import React, { Component } from "react";
+import { context } from "../context";
 
-class Home extends Component {
+export default class Home extends Component {
   render() {
-    return <h2>Home </h2>;
+    const { current_user } = this.context;
+    return (
+      <div>
+        Home
+        <button onClick={this.context.logout}>Logout</button>
+      </div>
+    );
   }
 }
 
-export default Home;
-
-
-
-/**
-   Assignment
-   step-1 set context into this class context.
-   step-2 iterate this.context.data.users .
-*/
+Home.contextType = context;
